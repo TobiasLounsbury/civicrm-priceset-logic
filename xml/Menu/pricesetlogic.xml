@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/contribute/pricing/logic</path>
+    <page_callback>CRM_PriceSetLogic_Form_PricingLogic</page_callback>
+    <title>Pricing Logic</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>

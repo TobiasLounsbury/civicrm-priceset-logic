@@ -16,10 +16,23 @@ class CRM_PriceSetLogic_Form_PricingLogic extends CRM_Contribute_Form_Contributi
       ts('Enable Custom Values?')
     );
 
-    $this->addCountry("CountryTemplate", "CountryTemplate");
 
-    //Get the country and states
+
+    //Get the countries
     $Countries = CRM_Core_PseudoConstant::country();
+
+    //This is to handle changes in the 4.7 form api
+    //$this->addCountry("CountryTemplate", "CountryTemplate");
+    $props['class'] = 'crm-select2';
+    $props['placeholder'] = ts('- select -');
+    $this->add('select', "CountryTemplate", "CountryTemplate", $Countries, false, $props);
+
+
+
+
+
+
+    //Fetch states
     $States = CRM_Core_BAO_Location::getChainSelectValues(array_keys($Countries), 'country');
 
     //Is case we only have one enabled country
@@ -151,5 +164,9 @@ class CRM_PriceSetLogic_Form_PricingLogic extends CRM_Contribute_Form_Contributi
       }
     }
     return $elementNames;
+  }
+
+  public function getDefaultContext() {
+    return 'create';
   }
 }

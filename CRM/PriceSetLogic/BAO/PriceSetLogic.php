@@ -91,7 +91,7 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
     $customFields = array();
     $optionsToFetch = array();
 
-    if (!empty($profiles)) {
+    if (!empty($profiles) && !is_null($profiles[0])) {
       //gender_id, communication_style_id, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
       //checkbox: preferred_communication_method
       //select: preferred_mail_format, preferred_language

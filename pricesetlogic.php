@@ -282,7 +282,8 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
         if (CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCase($case, $form, $pageType)){
           foreach($case['values'] as $field) {
             if ($amount[$field['field']]['is_enter_qty']) {
-              $field['option'] = array_keys($amount[$field['field']]['options'])[0];
+              $keys = array_keys($amount[$field['field']]['options']);
+              $field['option'] = $keys[0];
             }
             $amount[$field['field']]['options'][$field['option']]['amount'] = $field['price'];
 

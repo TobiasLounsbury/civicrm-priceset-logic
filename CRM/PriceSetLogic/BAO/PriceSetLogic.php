@@ -114,13 +114,15 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
           $ProfileFields[$field['field_name']]['type'] = "custom";
         } elseif (substr($field['field_name'], 0, 7) == "country") {
           unset($ProfileFields[$field['field_name']]);
-          $field['field_name'] = $field['field_name'] ."-". $field['location_type_id'];
+          $fieldLocation = CRM_Utils_Array::value("location_type_id", $field, "Primary");
+          $field['field_name'] = $field['field_name'] ."-". $fieldLocation;
           $ProfileFields[$field['field_name']] = $field;
           $ProfileFields[$field['field_name']]['html_type'] = "country";
           $ProfileFields[$field['field_name']]['type'] = "country";
         } elseif (substr($field['field_name'], 0, 5) == "state") {
           unset($ProfileFields[$field['field_name']]);
-          $field['field_name'] = $field['field_name'] ."-". $field['location_type_id'];
+          $fieldLocation = CRM_Utils_Array::value("location_type_id", $field, "Primary");
+          $field['field_name'] = $field['field_name'] ."-". $fieldLocation;
           $ProfileFields[$field['field_name']] = $field;
           $ProfileFields[$field['field_name']]['html_type'] = "state";
           $ProfileFields[$field['field_name']]['type'] = "state";

@@ -103,8 +103,7 @@ CRM.$(function ($) {
         obj.attr('price', '["' + ele + '", "' + addprice.toFixed(2) + '||"]');
 
 
-        $("#price_" + value.field + " + span.price-field-amount").text(symbol + "" + formatMoney(addprice, 2, seperator, thousandMarker));
-
+        $("#price_" + value.field).parent().find("span.price-field-amount").text(symbol + " " + formatMoney(addprice, 2, seperator, thousandMarker));
         obj.keyup();
         break;
     }
@@ -434,7 +433,7 @@ CRM.$(function ($) {
 
   //Now set up all of our triggers
   for(i in CRM.PricingLogic.TriggerFields) {
-    console.log("#" + CRM.PricingLogic.FormId + " [name='"+i+"']");
+    //console.log("#" + CRM.PricingLogic.FormId + " [name='"+i+"']");
     $("#" + CRM.PricingLogic.FormId + " [name='"+i+"']").change(
       CRM.PricingLogic.CreateTriggerEventWatcher(CRM.PricingLogic.TriggerFields[i])
     );

@@ -128,6 +128,12 @@ CRM.$(function($) {
             } else {
 
                 var field;
+
+                //Handle Missing Locations.
+                if (caseData.field.substr(-1) === "-") {
+                    caseData.field = caseData.field + "Primary";
+                }
+
                 if ( $.isNumeric( caseData.field ) ) {
                     field = CRM.PricingLogic.PriceFields[caseData.field];
                 } else {

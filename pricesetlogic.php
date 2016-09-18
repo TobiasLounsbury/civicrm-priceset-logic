@@ -156,19 +156,20 @@ function pricesetlogic_civicrm_buildForm( $formName, &$form ) {
     $Set = $priceSetId = false;
     //Check to see if we have a custom set for this page
     if ($formName == "CRM_Contribute_Form_Contribution_Main") {
-      $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("contribution", $form->get('id'));
+      $formId = $form->get("id");
+      $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("contribution", $formId);
 
       //Get the Price-Set Fields and values
-      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $form->get('id'), 3, 1);
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $formId, 3, 1);
       if (!$priceSetId) {
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $form->get('id'), 2, 1);
+        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $formId, 2, 1);
       }
-      $ufJoinParams = array("entity_id" => $form->get('id'), "entity_table" => "civicrm_contribution_page", "module" => "CiviContribute");
+      $ufJoinParams = array("entity_id" => $formId, "entity_table" => "civicrm_contribution_page", "module" => "CiviContribute");
       $formHtmlId = "Main";
     }
 
     if ($formName == "CRM_Event_Form_Registration_Register") {
-      $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("event", $form->get('id'));
+      $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("event", $formId);
       //Get the price set for registration page
       //todo: Rework this to function properly
       //$priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $form->get('id'), 3, 1);

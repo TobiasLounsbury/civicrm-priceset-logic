@@ -50,7 +50,7 @@ function civicrm_api3_price_set_logic_get($params) {
           array($params['page_type'], 'String'));
         $dao =& CRM_Core_DAO::executeQuery("SELECT * FROM `civicrm_pricesetlogic` WHERE `page_id` = %0 AND `page_type` = %1", $vals);
         if ($dao->fetch()) {
-            $returnValues = (array) $dao;
+            $returnValues = $dao->toArray();
         } else {
             $returnValues = array();
         }

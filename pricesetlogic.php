@@ -206,6 +206,14 @@ function pricesetlogic_civicrm_buildForm( $formName, &$form ) {
       CRM_Core_Resources::singleton()->addSetting(array('PricingLogic' => array('TriggerFields' => $triggerFields)));
       CRM_Core_Resources::singleton()->addSetting(array('PricingLogic' => array('FormId' => $formHtmlId)));
 
+      //Add the appropriate javascript functions based on version
+      $version = substr(CRM_Utils_System::version(), 0, 3);
+      if($version <= 4.6) {
+        CRM_Core_Resources::singleton()->addScriptFile('com.tobiaslounsbury.pricesetlogic', 'pricesetlogic_46.js', 19, 'page-footer');
+      } else {
+        CRM_Core_Resources::singleton()->addScriptFile('com.tobiaslounsbury.pricesetlogic', 'pricesetlogic_47.js', 19, 'page-footer');
+      }
+
       CRM_Core_Resources::singleton()->addScriptFile('com.tobiaslounsbury.pricesetlogic', 'pricesetlogic.js', 20, 'page-footer');
     }
   }

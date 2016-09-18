@@ -208,6 +208,8 @@ CRM.$(function($) {
                 //Add it to the Case
                 vals.append(valObj);
             }
+
+            vals.append(vals.find(".AddButton"));
         }
 
         //Set the Advanced Options
@@ -581,6 +583,7 @@ CRM.$(function($) {
     //Create the add functionality
     $(".AddButton").click(function(e) {
         $(this).parent().append( $("#Templates > .ValueAssignment").clone(true) );
+        $(this).parent().append($(this));
         refreshSortables();
         refreshAssignmentList( $(this).closest(".Case") );
         return e.preventDefault();

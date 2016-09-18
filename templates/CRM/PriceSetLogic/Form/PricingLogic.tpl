@@ -61,7 +61,7 @@
         <input class="FieldCaseValue" />
         <div style="clear: both;"></div>
         <div class="FieldsList">
-            <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span></a>
+            <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Field{/ts}</a>
         </div>
         <div class="AdvancedList">
             <a class="AdvancedButton  crm-hover-button" href="#" title="{ts}Show Advanced Options{/ts}"><span class="icon ui-icon-triangle-1-s"></span>{ts}Advanced Options{/ts}</a>
@@ -84,7 +84,7 @@
         </select>
         <div class="Slot Slot2"></div>
         <div class="FieldsList">
-            <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span></a>
+            <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Field{/ts}</a>
         </div>
         <div class="AdvancedList">
             <a class="AdvancedButton crm-hover-button" href="#" title="{ts}Show Advanced Options{/ts}"><span class="icon ui-icon-triangle-1-s"></span>{ts}Advanced Options{/ts}</a>

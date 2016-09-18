@@ -266,18 +266,16 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
         return (!array_key_exists($condition['option'], $fieldVal) || !($fieldVal[$condition['option']] == 1));
       case 'selected':
         if (is_array($condition['option'])) {
-          $conditionValue = $condition['option'][0];
+          return ($fieldVal == $condition['option'][0]);
         } else {
-          $conditionValue = $condition['option'];
+          return ($fieldVal == $condition['option']);
         }
-        return ($fieldVal == $conditionValue);
       case 'not-selected':
         if (is_array($condition['option'])) {
-          $conditionValue = $condition['option'][0];
+          return !($fieldVal == $condition['option'][0]);
         } else {
-          $conditionValue = $condition['option'];
+          return !($fieldVal == $condition['option']);
         }
-        return !($fieldVal == $conditionValue);
       case 'in':
         if (is_array($condition['option'])) {
           return in_array($fieldVal, $condition['option']);

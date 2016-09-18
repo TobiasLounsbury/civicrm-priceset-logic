@@ -269,6 +269,11 @@ function pricesetlogic_trigger_fields($cases, $caseIndex = null) {
     }
   }
 
+  //Make only one entry for each case for each field.
+  foreach($fields as $field => &$cases) {
+    $cases = array_unique($cases);
+  }
+
   return $fields;
 }
 

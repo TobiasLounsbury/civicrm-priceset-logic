@@ -254,13 +254,13 @@ function pricesetlogic_trigger_fields($cases, $caseIndex = null) {
   $fields = array();
 
   foreach($cases as $id => $case) {
-    if($caseIndex) {
+    if(!is_null($caseIndex)) {
       $caseToTrigger = $caseIndex;
     } else {
       $caseToTrigger = $id;
     }
     if($case['type'] == "union") {
-     $fields = array_merge_recursive($fields, pricesetlogic_trigger_fields($case['slot'], $caseToTrigger));
+      $fields = array_merge_recursive($fields, pricesetlogic_trigger_fields($case['slot'], $caseToTrigger));
     } else {
       if ($case['field'] != 'javascript') {
         $field = (is_numeric($case['field'])) ? "price_".$case['field'] : $case['field'];

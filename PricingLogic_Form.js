@@ -365,6 +365,17 @@ CRM.$(function($) {
         }
     }
 
+    /**
+     * This function is used when you add a ase to scroll to
+     * the bottom of the editor and reveal the new case.
+     */
+    function scrollToEditorBottom() {
+        if ($("#ValueEditor").hasClass("CVMax")) {
+            $("#ValueEditor").animate({ scrollTop: $("#ValueEditor").height() }, "fast");
+        } else {
+            $("html, body").animate({ scrollTop: $("#Cases").height() }, "fast");
+        }
+    }
 
     // bind click event to pricesetlogic_active checkbox
     $('#pricesetlogic_active').click(function () {
@@ -651,6 +662,7 @@ CRM.$(function($) {
         makeCaseSortable( obj.add( obj.find(".Slot") ) );
         refreshSortables();
         rebuildNames();
+        scrollToEditorBottom();
         return e.preventDefault();
     });
 
@@ -671,6 +683,7 @@ CRM.$(function($) {
         refreshSortables();
         rebuildNames();
         obj.find(".caseFields").change();
+        scrollToEditorBottom();
         return e.preventDefault();
     });
 

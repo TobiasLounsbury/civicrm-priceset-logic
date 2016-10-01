@@ -1,5 +1,11 @@
 CRM.$(function($) {
 
+
+    /**
+     * Rebuild The field assignment names so as to preserve order
+     *
+     * @param caseObj
+     */
     function refreshAssignmentList(caseObj) {
         var baseName = caseObj.attr("name");
         caseObj.children(".FieldsList").children(".ValueAssignment").each(function(i) {
@@ -10,6 +16,12 @@ CRM.$(function($) {
         });
     }
 
+    /**
+     * Rebuild the name attributes for each case so that is preserves
+     * order of execution
+     *
+     * @param caseObj
+     */
     function rebuildCaseNames(caseObj) {
         var baseName = caseObj.attr("name");
         caseObj.children(".CaseType").attr("name", baseName + "[type]");
@@ -36,6 +48,10 @@ CRM.$(function($) {
         }
     }
 
+    /**
+     * Rebuilds the names for the sub-cases inside a untion
+     * to preserve order
+     */
     function rebuildNames() {
         $("#Cases .Slot").removeClass("empty");
         $("#Cases .Slot:empty").addClass("empty");
@@ -47,14 +63,24 @@ CRM.$(function($) {
         });
     }
 
+    /**
+     * Wrappper to refresh the sortable lists after adding items
+     */
     function refreshSortables() {
         $("#Cases, #Cases .Slot").sortable('refresh');
         $("#Cases .FieldsList").sortable('refresh');
     }
 
-    //This is done as a function because if you make the templates
-    //sortable first and then do the deep clone it doesn't properly
-    //clone the sortable widgets and fails silently.
+
+    /**
+     * Makes a case sortable
+     *
+     * This is done as a function because if you make the templates
+     * sortable first and then do the deep clone it doesn't properly
+     * clone the sortable widgets and fails silently.
+     *
+     * @param selector
+     */
     function makeCaseSortable(selector) {
         //Make the Cases sortable
         $(selector).sortable({
@@ -100,6 +126,13 @@ CRM.$(function($) {
         });
     }
 
+
+    /**
+     * Used to build a case interface element from saved data
+     *
+     * @param caseData
+     * @returns {*}
+     */
     function buildCaseFromData(caseData) {
         var obj;
         if (caseData.type == "union") {
@@ -220,12 +253,26 @@ CRM.$(function($) {
     }
 
 
+    /**
+     * Populates the list of price-set fields
+     *
+     * @param field
+     * @param trgt
+     */
     function populatePriceFieldOption(field, trgt) {
         for (var i in CRM.PricingLogic.PriceFields[field].values) {
             trgt.append("<option value='" + CRM.PricingLogic.PriceFields[field].values[i].id + "'>" + CRM.PricingLogic.PriceFields[field].values[i].label + "</option>")
         }
     }
 
+
+    /**
+     * Get the Operation Options for a given field type
+     *
+     * @param field
+     * @param op
+     * @returns {{options: (*|jQuery|HTMLElement), class: string}}
+     */
     function getOpOptions(field, op) {
         var newOptions = $(false);
         var newClass = "";
@@ -290,6 +337,12 @@ CRM.$(function($) {
         return {'options': newOptions, 'class': newClass};
     }
 
+    /**
+     * Retrieves/generates the value options for a given field value assignment
+     *
+     * @param field
+     * @returns {*}
+     */
     function getValueOptions(field) {
         if (field.html_type == "radio" && field.hasOwnProperty("data_type") && field.data_type == "binary") {
             return "<option value='1'>" + ts("Yes") + "</option><option value='0'>" + ts("No") + "</option>";
@@ -580,7 +633,7 @@ CRM.$(function($) {
         return e.preventDefault();
     });
 
-    //Create the add functionality
+    //Create the add new field price functionality
     $(".AddButton").click(function(e) {
         $(this).parent().append( $("#Templates > .ValueAssignment").clone(true) );
         $(this).parent().append($(this));
@@ -601,7 +654,7 @@ CRM.$(function($) {
         return e.preventDefault();
     });
 
-    //Add a new field condition
+    //Add a new single case field condition
     $("#AddCase").click(function(e) {
         //This makes it so a new field condition is added directly to thefirst empty slot in a union
         var obj = $("#Templates > .FieldCase").clone(true);
@@ -621,7 +674,9 @@ CRM.$(function($) {
         return e.preventDefault();
     });
 
-    //Make the editor's width resizable
+    /**
+     * wire up the Min/Max functionality
+     */
     $("#MinMax").click(function() {
         if($("#ValueEditor").hasClass("CVMax")) {
             //Minimize the editor

@@ -294,6 +294,8 @@ CRM.$(function($) {
                 }
                 break;
 
+            case 'multi-select':
+              alert(ts("Please be aware: Multi-select boxes are only partially supported."));
             case 'autocomplete-select':
             case 'select':
                 if(!op.hasClass("select")) {
@@ -331,7 +333,7 @@ CRM.$(function($) {
                 break;
 
             default:
-                //console.log(field.html_type);
+                console.log(field.html_type);
                 alert(ts("Something has gone wrong, please contact the your administrator or the plugin author"));
         }
         return {'options': newOptions, 'class': newClass};
@@ -344,7 +346,7 @@ CRM.$(function($) {
      * @returns {*}
      */
     function getValueOptions(field) {
-        if (field.html_type == "radio" && field.hasOwnProperty("data_type") && field.data_type == "binary") {
+        if (field.html_type == "radio" && field.hasOwnProperty("data_type") && (field.data_type == "binary" || field.data_type == "boolean")) {
             return "<option value='1'>" + ts("Yes") + "</option><option value='0'>" + ts("No") + "</option>";
         } else if (field.html_type == "country") {
             return $("#Templates #CountryTemplate > option").clone();

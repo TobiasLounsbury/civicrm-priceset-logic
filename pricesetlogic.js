@@ -4,16 +4,19 @@
 
 CRM.$(function ($) {
 
+  CRM.PricingLogic.TriggerRunning = false;
+
+
   /***************[  ]***************/
   CRM.PricingLogic.EvaluateCondition = function (caseData) {
     if (caseData.field == "javascript") {
       return CRM.PricingLogic.RunFunction(caseData.value);
     }
 
-    var fieldVal;
+    var fieldVal,fieldType, optionValue;
     //This is a Price Field
     if ($.isNumeric(caseData.field)) {
-
+      fieldType = "price";
       if ($("#price_" + caseData.field + "_" + caseData.option).length == 1) {
         //checkboxes
         fieldVal = $("#price_" + caseData.field + "_" + caseData.option).is(":checked");
@@ -27,22 +30,81 @@ CRM.$(function ($) {
 
       //And these are profile fields
     } else {
-      if (caseData.field.substring(0, 6) == "custom") {
-        console.log("custom");
-        //custom
-        //todo: Handle custom fields
-        //select
-        //radio
-        //text
-        //checkbox
+
+      fieldType = "profile";
+
+      //Custom data fields within profiles
+      if (CRM.PricingLogic.ProfileFields[caseData.field].type == "custom") {
+
+        //Switch based on the HTML type we have on file in the profile
+        //field definitions provided by price-set-logic in the CRM.PricingLogic var
+        switch (CRM.PricingLogic.ProfileFields[caseData.field].html_type) {
+
+          //Select and Text Boxes
+          case "select":
+          case "autocomplete-select":
+          case "text":
+            fieldVal = $("#" + caseData.field).val();
+            break;
+
+          //Radio Buttons
+          case "radio":
+            fieldVal = $("input.crm-form-radio[name='custom_" + caseData.field + "']:checked").val();
+            break;
+
+          //Checkboxes
+          case "checkbox":
+            optionValue = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
+            fieldVal = $("input[id='" + caseData.field + "_" + optionValue + "']").is(":checked");
+            break;
+
+          //Unknown html Type
+          default:
+            //Should this return false?
+            if(window.console) {console.error("Unknown html_type: " + CRM.PricingLogic.ProfileFields[caseData.field].html_type); }
+            return false;
+
+        }
+
+        //Core Fields
       } else {
-        //todo: handle Dates
-        //todo: This should be better tested for profiles that contain other kinds of core fields
-        //This is enough for all address fields and that is as far as I've tested
-        //so that this point move forward assuming we can just call val()
-        fieldVal = $("#" + caseData.field).val();
+
+        switch (CRM.PricingLogic.ProfileFields[caseData.field].html_type) {
+
+          //Radio Buttons
+          case "select":
+          case "radio":
+            if(CRM.$("[name='" + caseData.field + "']")[0].type == "radio") {
+              fieldVal = $("input.crm-form-radio[name='" + caseData.field + "']:checked").val();
+            } else {
+              fieldVal = $("#" + caseData.field).val();
+            }
+            break;
+
+          //Checkboxes
+          case "CheckBox":
+          case "checkbox":
+            fieldVal = $("#" + caseData.field).is(":checked");
+            break;
+
+          //Select and Text Boxes
+          case "autocomplete-select":
+          case "text":
+            fieldVal = $("#" + caseData.field).val();
+            break;
+
+          //todo: handle Dates
+
+          default:
+            if(window.console) {console.error("Unknown html_type: " + CRM.PricingLogic.ProfileFields[caseData.field].html_type); }
+            fieldVal = $("#" + caseData.field).val();
+            break;
+
+        }
       }
     }
+
+    //Actually do the evaluation
     switch( caseData.op ) {
       case '=':
         return (fieldVal == caseData.value);
@@ -67,9 +129,19 @@ CRM.$(function ($) {
       case 'not-checked':
         return !(fieldVal);
       case 'selected':
-        return (fieldVal == caseData.option[0]);
+        if(fieldType == "profile") {
+          var optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
+          return (fieldVal == optVal);
+        } else {
+          return (fieldVal == caseData.option[0]);
+        }
       case 'not-selected':
-        return (fieldVal != caseData.option[0]);
+        if(fieldType == "profile") {
+          var optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
+          return (fieldVal != optVal);
+        } else {
+          return (fieldVal != caseData.option[0]);
+        }
       case 'in':
         if ($.isArray(caseData.option)) {
           return !($.inArray(fieldVal, caseData.option) === -1);
@@ -175,11 +247,14 @@ CRM.$(function ($) {
    * @returns {Function}
    * @constructor
    */
-  CRM.PricingLogic.CreateTriggerEventWatcher = function(cases) {
-    return function() {
-      CRM.PricingLogic.Trigger(cases);
-    };
+  CRM.PricingLogic.TriggerEventWatcher = function(event) {
+    if(!CRM.PricingLogic.TriggerRunning) {
+      CRM.PricingLogic.TriggerRunning = true;
+      CRM.PricingLogic.EvaluateCases();
+      CRM.PricingLogic.TriggerRunning = false;
+    }
   };
+
 
   /**
    *This is a function that can be called to trigger a
@@ -189,14 +264,9 @@ CRM.$(function ($) {
    *
    * @param cases - a list of case indexes to evaluate empty for all
    */
-  CRM.PricingLogic.Trigger = function (cases) {
-    if (typeof(cases) == 'undefined') {
-      cases = Object.keys(CRM.PricingLogic.Cases);
-    }
+  CRM.PricingLogic.EvaluateCases = function () {
 
-    if (!$.isArray(cases)) {
-      cases = [cases];
-    }
+    var cases = Object.keys(CRM.PricingLogic.Cases);
 
     var toDefault = {};
     var alreadySet = {};
@@ -210,12 +280,15 @@ CRM.$(function ($) {
             CRM.PricingLogic.RunFunction(CRM.PricingLogic.Cases[cases[i]].truefunction);
           }
           alreadySet = $.extend(alreadySet, CRM.PricingLogic.makePriceFieldList(CRM.PricingLogic.Cases[cases[i]].values));
+          //console.log("Evaluates to true: ", CRM.PricingLogic.Cases[cases[i]] );
         } else {
           CRM.PricingLogic.RunFunction(CRM.PricingLogic.Cases[cases[i]].falsefunction);
           toDefault = $.extend(toDefault, CRM.PricingLogic.makePriceFieldList(CRM.PricingLogic.Cases[cases[i]].values));
+
+          //console.log("Evaluates to false: ", CRM.PricingLogic.Cases[cases[i]] );
         }
       } else {
-        console.log("Cannot find case", cases[i]);
+        //console.log("Cannot find case", cases[i]);
       }
     }
 
@@ -233,17 +306,69 @@ CRM.$(function ($) {
     CRM.PricingLogic.resetPricing(CRM.PricingLogic.PriceFields[i]);
   }
 
+
   //Now set up all of our triggers
+  var sels = [];
   for(i in CRM.PricingLogic.TriggerFields) {
-    //console.log("#" + CRM.PricingLogic.FormId + " [name='"+i+"']");
-    $("#" + CRM.PricingLogic.FormId + " [name='"+i+"']").change(
-      CRM.PricingLogic.CreateTriggerEventWatcher(CRM.PricingLogic.TriggerFields[i])
-    );
+
+    if(i.substring(0, 5) === "price") {
+      var pfid = i.substring(6);
+      switch(CRM.PricingLogic.AllPriceFields[pfid].html_type) {
+        case "checkbox":
+          //checkboxes
+          for(var o in CRM.PricingLogic.TriggerFields[i]) {
+            sels.push("#" + i + "_" + CRM.PricingLogic.TriggerFields[i][o]);
+          }
+
+          break;
+        case "radio":
+          sels.push("input.crm-form-radio[name='" + i + "']");
+          break;
+        default:
+          //Select boxes and text inputs
+          sels.push("#"+i);
+          break;
+      }
+    } else {
+      //Profile Fields
+
+
+      //Switch based on the HTML type we have on file in the profile
+      //field definitions provided by price-set-logic in the CRM.PricingLogic var
+      switch (CRM.PricingLogic.ProfileFields[i].html_type) {
+
+        //Radio Buttons
+        case "radio":
+          sels.push("input.crm-form-radio[name='" + i + "']");
+          break;
+
+        //Checkboxes
+        case "checkbox":
+          if (CRM.PricingLogic.ProfileFields[i].type == "custom") {
+            for(var o in CRM.PricingLogic.TriggerFields[i]) {
+              optionValue = CRM._.where(CRM.PricingLogic.ProfileFields[i].values, {"id": CRM.PricingLogic.TriggerFields[i][o]})[0].value;
+              sels.push("input[id='" + i + "_" + optionValue + "']");
+            }
+          } else {
+            sels.push("#" + i);
+          }
+
+          break;
+
+        default:
+          sels.push("#" + i);
+          break;
+      }
+
+    }
   }
+
+  sel = sels.join(",");
+  $(sel).change(CRM.PricingLogic.TriggerEventWatcher);
 
 
   //Trigger a complete evaluation on page load So that we take into account
   //The data in boxes that doesn't change like name or country etc.
-  CRM.PricingLogic.Trigger();
+  CRM.PricingLogic.EvaluateCases();
 
 });

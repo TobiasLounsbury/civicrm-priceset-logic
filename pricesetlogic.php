@@ -250,39 +250,38 @@ function pricesetlogic_pricefields($cases) {
  *
  * @param $cases
  */
-function pricesetlogic_trigger_fields($cases, $caseIndex = null) {
+function pricesetlogic_trigger_fields($cases) {
   $fields = array();
 
   foreach($cases as $id => $case) {
-    if(!is_null($caseIndex)) {
-      $caseToTrigger = $caseIndex;
-    } else {
-      $caseToTrigger = $id;
-    }
     if($case['type'] == "union") {
-      $fields = array_merge_recursive($fields, pricesetlogic_trigger_fields($case['slot'], $caseToTrigger));
-    } else {
-      if ($case['field'] != 'javascript') {
-        $field = (is_numeric($case['field'])) ? "price_".$case['field'] : $case['field'];
-        $fields = array_merge_recursive($fields, array($field => array($caseToTrigger)));
-      }
+      $fields = array_merge_recursive($fields, pricesetlogic_trigger_fields($case['slot']));
+    } elseif ($case['field'] != 'javascript') {
+      $field = (is_numeric($case['field'])) ? "price_".$case['field'] : $case['field'];
+      $fields = array_merge_recursive($fields, array($field => $case['option']));
     }
-  }
-
-  //Make only one entry for each case for each field.
-  foreach($fields as $field => &$cases) {
-    $cases = array_unique($cases);
   }
 
   return $fields;
 }
 
+
+
+/**
+ * Build Amount
+ *
+ * @param $pageType
+ * @param $form
+ * @param $amount
+ * @throws CiviCRM_API3_Exception
+ */
 function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
   if (!empty($form->_submitValues)) {
     $Set = false;
 
     if ($pageType == "contribution" || $pageType =="membership") {
       $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("contribution", $form->get('id'));
+      $ufJoinParams = array("entity_id" => $form->get('id'), "entity_table" => "civicrm_contribution_page", "module" => "CiviContribute");
     }
 
     //todo: Make this work properly
@@ -290,10 +289,25 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
       $Set = CRM_PriceSetLogic_BAO_PriceSetLogic::getSet("event", $form->get('id'));
     }
 
+
+    //todo: Refactor this to allow relative/cumulative price changes.
     if($Set && $Set['is_active'] == 1) {
+
+      //Create a list of all unique fields that can affect when a price changes(trigger fields)
+      $profiles = array();
+
+      if($ufJoinParams) {
+        list($profiles[], $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        if ($second) {
+          $profiles[] = array_shift($second);
+        }
+        $Set['profileFields'] = CRM_PriceSetLogic_BAO_PriceSetLogic::getProfileFields($profiles);
+      }
+
+
       //Evaluate the Cases and Adjust prices as required.
       foreach($Set['cases'] as $case) {
-        if (CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCase($case, $form, $pageType)){
+        if (CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCase($case, $form, $pageType, $Set)){
           foreach($case['values'] as $field) {
             if ($amount[$field['field']]['is_enter_qty']) {
               $keys = array_keys($amount[$field['field']]['options']);

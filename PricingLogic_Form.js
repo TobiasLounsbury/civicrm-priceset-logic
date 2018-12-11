@@ -1,5 +1,7 @@
 CRM.$(function($) {
 
+  //Make sure this objec texists before we start working with it.
+  CRM.PricingLogic = CRM.PricingLogic || {};
 
   /**
    * Rebuild The field assignment names so as to preserve order
@@ -68,6 +70,13 @@ CRM.$(function($) {
   }
 
 
+  function handleSubSectionVisibility() {
+    $("#Cases > .Case > .FieldsList, #Cases > .Case > .AdvancedList").slideDown();
+    $("#Cases > .Case .Case .FieldsList, #Cases > .Case .Case .AdvancedList").slideUp();
+    $("#Cases > .Case.pseudotype .FieldsList, #Cases > .Case.pseudotype .AdvancedList").slideUp();
+  }
+
+
   /**
    * Makes a case sortable
    *
@@ -87,17 +96,13 @@ CRM.$(function($) {
       helper: 'clone',
       opacity: 0.7,
       placeholder: "custom-value-highlight",
-      start: function (e, ui) {
-          ui.item.show();
-          console.log(ui.item);
-          },
+      start: function (e, ui) { ui.item.show(); },
       receive: function( event, ui ) {
         if($(event.target).attr("id") != "Cases") {
           $(event.target).closest(".Case").find(".FieldsList").append(ui.item.find(".ValueAssignment"));
           ui.item.find(".ValueAssignment").remove();
         }
-        $("#Cases > .Case > .FieldsList, #Cases > .Case > .AdvancedList").slideDown();
-        $("#Cases > .Case .Case .FieldsList, #Cases > .Case .Case .AdvancedList").slideUp();
+        handleSubSectionVisibility();
       },
       stop: function( event, ui ) {
         //Refresh the names
@@ -133,13 +138,13 @@ CRM.$(function($) {
       //Set the UnionType
       obj.find(".UnionType").val(caseData.op);
 
-      //todo: Refactor to loop through all child cases
       //recursively load Child Cases
       if(caseData.hasOwnProperty("slot")) {
         for(s in caseData.slot) {
           obj.children(".ChildCases").append(buildCaseFromData(caseData.slot[s]));
         }
       }
+
     } else if (caseData.type == "condition") {
       obj = $("#Templates .FieldCase").clone(true);
 
@@ -151,6 +156,9 @@ CRM.$(function($) {
 
       if (caseData.field == 'javascript') {
         obj.find(".FieldCaseValue").addClass("javascript");
+      } else if (caseData.field == 'cividiscount') {
+        obj.addClass("pseudotype");
+        obj.find(".FieldCaseValue").hide();
       } else {
 
         var field;
@@ -407,7 +415,12 @@ CRM.$(function($) {
 
   //Add Javascript type
   $("#Templates .FieldCase > .caseFields").append("<option value='javascript'>" + ts("Custom JavaScript Function") + "</option>");
-  //todo: Add discount type
+
+
+  //Add a civiDiscount evaluation pseudo type so the admin can
+  //choose where to evaluate discounts within the rest of the pricing logic
+  $("#Templates .FieldCase > .caseFields").append("<option value='cividiscount'>" + ts("CiviDiscount Codes") + "</option>");
+
 
 
 
@@ -466,6 +479,8 @@ CRM.$(function($) {
     var valsObj = caseObj.find("select.FieldCaseOption");
     var valsDisplayObj = caseObj.find("div.FieldCaseOption");
 
+    caseObj.removeClass("pseudotype");
+
     if ( $(this).val() == "javascript") {
       //JavaScript
       var fval = caseObj.find(".FieldCaseValue");
@@ -475,6 +490,7 @@ CRM.$(function($) {
           slide: 'left', done: function () {
             valsObj.find("option,optgroup").remove();
             valsObj.val(null).select2('destroy');
+            valsObj.hide();
           }
         });
       }
@@ -487,8 +503,22 @@ CRM.$(function($) {
         fval.show({slide: 'left'});
       }
 
-    } else {
 
+
+    } else if ( $(this).val() == "cividiscount") {
+      caseObj.addClass("pseudotype");
+      caseObj.find(".FieldCaseValue").hide({slide: 'left'}).val("");
+      op.removeClass().addClass("op").hide({slide: 'left'});
+      if (valsDisplayObj && valsDisplayObj.is(":visible")) {
+        valsDisplayObj.hide({
+          slide: 'left', done: function () {
+            valsObj.find("option,optgroup").remove();
+            valsObj.val(null).select2('destroy');
+            valsObj.hide();
+          }
+        });
+      }
+    } else {
       if ($.isNumeric($(this).val())) {
         //PriceSet Fields
         var field = CRM.PricingLogic.PriceFields[ $(this).val() ];
@@ -553,6 +583,8 @@ CRM.$(function($) {
         op.change();
       }
     }
+
+    handleSubSectionVisibility();
   });
 
   //Setup the logic for conditional operation changes
@@ -765,6 +797,9 @@ CRM.$(function($) {
 
   //Create the initial Sortables
   makeCaseSortable("#Cases, #Cases .Slot");
+
+  //Handle hiding and showing subsections on page load.
+  handleSubSectionVisibility();
 });
 
 // function to show/hide settings

@@ -29,12 +29,18 @@
         <div id="ValueAnchor">
             <div id="ValueEditor" class="crm-container CVMin">
                 <h3 class="pricesetlogic-section">{ts}Custom Values{/ts}:
-                    <a class="crm-hover-button" id="MinMax" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
-                    <a class="crm-hover-button" id="AddUnion" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
-                    <a class="crm-hover-button" id="AddCase" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-minmax" id="MinMaxTop" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
+                    <a class="crm-hover-button pricesetlogic-addunion" id="AddUnionTop" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-addcase" id="AddCaseTop" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
                     <div style="clear: both;"></div>
                 </h3>
                 <div id="Cases"></div>
+                <h3 class="pricesetlogic-section pricesetlogic-bottom-section">
+                    <a class="crm-hover-button pricesetlogic-minmax" id="MinMaxBottom" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
+                    <a class="crm-hover-button pricesetlogic-addunion" id="AddUnionBottom" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-addcase" id="AddCaseBottom" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
+                    <div style="clear: both;"></div>
+                </h3>
             </div>
         </div>
 

@@ -656,7 +656,7 @@ CRM.$(function($) {
     });
 
     //Add A Union to Cases
-    $("#AddUnion").click(function(e) {
+    $(".pricesetlogic-addunion").click(function(e) {
         var obj = $("#Templates > .UnionCase").clone(true);
         obj.attr("name", "cases[" + $("#Cases>.Case").size() + "]");
         $("#Cases").append( obj );
@@ -669,7 +669,7 @@ CRM.$(function($) {
     });
 
     //Add a new single case field condition
-    $("#AddCase").click(function(e) {
+    $(".pricesetlogic-addcase").click(function(e) {
         //This makes it so a new field condition is added directly to thefirst empty slot in a union
         var obj = $("#Templates > .FieldCase").clone(true);
 
@@ -692,7 +692,7 @@ CRM.$(function($) {
     /**
      * wire up the Min/Max functionality
      */
-    $("#MinMax").click(function() {
+    $(".pricesetlogic-minmax").click(function() {
         if($("#ValueEditor").hasClass("CVMax")) {
             //Minimize the editor
             $("#BottomButtons").hide().appendTo("#PriceSetLogicSettings");
@@ -706,8 +706,8 @@ CRM.$(function($) {
                 $("#Cases").css("padding-top", "3px");
             });
 
-            $("#MinMax span").switchClass( "ui-icon-arrowstop-1-s", "ui-icon-extlink" );
-            $("#MinMax").attr("title", ts("Maximize the editor"));
+            $("#MinMaxTop span").switchClass( "ui-icon-arrowstop-1-s", "ui-icon-extlink" );
+            $("#MinMaxTop").attr("title", ts("Maximize the editor"));
         } else {
             //Maximize the window
             //store the original position height and width;
@@ -727,8 +727,8 @@ CRM.$(function($) {
                 $("#BottomButtons").hide().appendTo("#ValueEditor").fadeIn();
             });
             $("#ValueEditor").addClass("CVMax");
-            $("#MinMax span").switchClass( "ui-icon-extlink", "ui-icon-arrowstop-1-s" );
-            $("#MinMax").attr("title", ts("Minimize the editor"));
+            $("#MinMaxTop span").switchClass( "ui-icon-extlink", "ui-icon-arrowstop-1-s" );
+            $("#MinMaxTop").attr("title", ts("Minimize the editor"));
         }
     });
     $("#Cases").resizable({handles: 'e',alsoResize: "#PriceSetLogicSettings h3.pricesetlogic-section"});

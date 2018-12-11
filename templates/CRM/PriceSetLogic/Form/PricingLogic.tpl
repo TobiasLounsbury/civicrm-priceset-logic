@@ -83,12 +83,11 @@
         <div class="GrabHandle CaseGrabHandle"><span class="icon ui-icon-grip-dotted-vertical"></span></div>
         <a class="DeleteHandle crm-hover-button" href="#" title="{ts}Remove this custom price from the list{/ts}"><span class="icon ui-icon-close"></span></a>
         <input type="hidden" class="CaseType" value="union" />
-        <div class="Slot Slot1"></div>
         <select class="UnionType">
-            <option value="and">AND</option>
-            <option value="or">OR</option>
+            <option value="and">{ts}AND - All conditions must be true{/ts}</option>
+            <option value="or">{ts}OR - Any one condition must be true{/ts}</option>
         </select>
-        <div class="Slot Slot2"></div>
+        <div class="Slot ChildCases"></div>
         <div class="FieldsList">
             <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Field{/ts}</a>
         </div>

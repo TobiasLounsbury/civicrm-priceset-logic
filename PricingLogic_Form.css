@@ -134,18 +134,9 @@ div.crm-container div.AdvancedOptions label {
 .custom-value-highlight {
     border: 1px dashed #00b;
     background: #85c0cc;
-}
-#Cases > .custom-value-highlight {
     height: 10px;
 }
-#Cases .Slot .custom-value-highlight {
-    display: none;
-}
 
-#Cases .Slot.empty .custom-value-highlight {
-    display: block;
-    height: 25px;
-}
 .DeleteHandle {
     float: right;
 }

@@ -251,9 +251,18 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
    */
   static function evaluateCondition($condition, &$form, $pageType, &$set) {
 
+    //Short circuit the evaluation for civiDiscount codes.
+    //They are always true because they aren't really part of Pricing Logic
+    //but a pseudo-condition used to help the two projects play nice.
+    if($condition['field'] == "cividiscount") {
+      return true;
+    }
+
+    //Call the backend evaluation function for a javascript condition
     if($condition['field'] == "javascript") {
       return CRM_PriceSetLogic_BAO_PriceSetLogic::javascriptCondition($condition['value'], $form, $pageType);
     }
+
 
     $fieldName = (is_numeric($condition['field'])) ? "price_".$condition['field'] : $condition['field'];
     $fieldVal = $form->_submitValues[$fieldName];

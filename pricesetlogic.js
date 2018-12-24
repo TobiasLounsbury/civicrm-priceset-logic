@@ -13,6 +13,10 @@ CRM.$(function ($) {
       return CRM.PricingLogic.RunFunction(caseData.value);
     }
 
+    if (caseData.field == "cividiscount") {
+      return true;
+    }
+
     var fieldVal,fieldType, optionValue;
     //This is a Price Field
     if ($.isNumeric(caseData.field)) {
@@ -313,10 +317,10 @@ CRM.$(function ($) {
 
     if(i.substring(0, 5) === "price") {
       var pfid = i.substring(6);
-      switch(CRM.PricingLogic.AllPriceFields[pfid].html_type) {
+      switch (CRM.PricingLogic.AllPriceFields[pfid].html_type) {
         case "checkbox":
           //checkboxes
-          for(var o in CRM.PricingLogic.TriggerFields[i]) {
+          for (var o in CRM.PricingLogic.TriggerFields[i]) {
             sels.push("#" + i + "_" + CRM.PricingLogic.TriggerFields[i][o]);
           }
 
@@ -326,9 +330,11 @@ CRM.$(function ($) {
           break;
         default:
           //Select boxes and text inputs
-          sels.push("#"+i);
+          sels.push("#" + i);
           break;
       }
+    } else if (i == "cividiscount") {
+      //Do we need to do anything here or just make sure NOT to break anything?
     } else {
       //Profile Fields
 
@@ -365,6 +371,13 @@ CRM.$(function ($) {
 
   sel = sels.join(",");
   $(sel).change(CRM.PricingLogic.TriggerEventWatcher);
+
+
+  //Handle civiDiscount setup
+  if(CRM.PricingLogic.civiDiscount.case !== false) {
+    CRM.PricingLogic.Cases[CRM.PricingLogic.civiDiscount.case].values = CRM.PricingLogic.civiDiscount.values;
+  }
+
 
 
   //Trigger a complete evaluation on page load So that we take into account

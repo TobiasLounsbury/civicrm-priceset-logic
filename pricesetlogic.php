@@ -249,6 +249,7 @@ function pricesetlogic_pricefields($cases) {
  * list of all "trigger fields"
  *
  * @param $cases
+ * @return array
  */
 function pricesetlogic_trigger_fields($cases) {
   $fields = array();
@@ -256,7 +257,7 @@ function pricesetlogic_trigger_fields($cases) {
   foreach($cases as $id => $case) {
     if($case['type'] == "union") {
       $fields = array_merge_recursive($fields, pricesetlogic_trigger_fields($case['slot']));
-    } elseif ($case['field'] != 'javascript') {
+    } elseif ($case['field'] != 'javascript' && $case['field'] != 'cividiscount') {
       $field = (is_numeric($case['field'])) ? "price_".$case['field'] : $case['field'];
       $fields = array_merge_recursive($fields, array($field => $case['option']));
     }
@@ -293,6 +294,7 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
     //todo: Refactor this to allow relative/cumulative price changes.
     if($Set && $Set['is_active'] == 1) {
 
+
       //Create a list of all unique fields that can affect when a price changes(trigger fields)
       $profiles = array();
 
@@ -305,6 +307,52 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
       }
 
 
+      $civiDiscountCase = false;
+      $civiDiscountValues = array();
+
+      //Start with an easy check to see if civiDiscount is installed and active.
+      if(function_exists("cividiscount_civicrm_buildAmount")) {
+
+        //Now make sure that there is a logic element for cividiscount in this set.
+        foreach($Set['cases'] as $id => &$case) {
+          if($case['field'] == "cividiscount") {
+            $civiDiscountCase = $id;
+            if(!array_key_exists("values", $case) || !is_array($case['values'])) {
+              $case['values'] = array();
+            }
+            break;
+          }
+        }
+
+        if($civiDiscountCase !== false) {
+
+          //Now check to see if any discounts were applied.
+          foreach ($amount as $piid => $item) {
+            if (array_key_exists("options", $item)) {
+              foreach ($item['options'] as $opid => $option) {
+                if (array_key_exists("discount_applied", $option)) {
+                  $civiDiscountValues[] = array("field" => $piid, "option" => $opid, "price" => $option['amount'], "origin" => $option);
+                }
+              }
+            }
+
+            if (array_key_exists("discount_applied", $item)) {
+              $civiDiscountValues[] = array("field" => $piid, "price" => $option['amount'], "origin" => $item);
+            }
+          }
+        }
+
+        //Now check to see if we have any logic that interacts with those
+        if(!empty($civiDiscountValues)) {
+          $Set['cases'][$civiDiscountCase]['values'] = $civiDiscountValues;
+          //Todo: This needs to be fleshed out, but would only be relevant if we have
+          //relative prices. So it needs to be implemented in conjunction with
+          //Relative price adjustments.
+
+        }
+
+      }
+
       //Evaluate the Cases and Adjust prices as required.
       foreach($Set['cases'] as $case) {
         if (CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCase($case, $form, $pageType, $Set)){
@@ -314,10 +362,11 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
               $field['option'] = $keys[0];
             }
             $amount[$field['field']]['options'][$field['option']]['amount'] = $field['price'];
-
           }
         }
       }
+
+      CRM_Core_Resources::singleton()->addSetting(array('PricingLogic' => array('civiDiscount' => array("case" => $civiDiscountCase, "values" => $civiDiscountValues ))));
     }
   }
 }
@@ -332,9 +381,8 @@ function pricesetlogic_civicrm_buildAmount( $pageType, &$form, &$amount ) {
 function pricesetlogic_civicrm_tabset($tabsetName, &$tabs, $context) {
 
   if ($tabsetName == 'civicrm/event/manage') {
-
+    
   }
-
 }
 
 /**

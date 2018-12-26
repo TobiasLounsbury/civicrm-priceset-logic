@@ -374,7 +374,7 @@ CRM.$(function ($) {
 
 
   //Handle civiDiscount setup
-  if(CRM.PricingLogic.civiDiscount.case !== false) {
+  if(CRM.PricingLogic.hasOwnProperty("civiDiscount") && CRM.PricingLogic.civiDiscount.case !== false) {
     CRM.PricingLogic.Cases[CRM.PricingLogic.civiDiscount.case].values = CRM.PricingLogic.civiDiscount.values;
   }
 

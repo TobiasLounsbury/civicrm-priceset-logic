@@ -279,9 +279,17 @@ CRM.$(function($) {
     var newClass = "";
     switch(field.html_type) {
 
-      case 'phone':
+      case 'number':
+      case 'tel':
       case 'email':
       case 'text':
+      case 'hidden':
+      case 'range':
+      case 'date':
+      case 'datetime-local':
+      case 'month':
+      case 'week':
+      case 'color':
         if(field.type == "price" && field.is_enter_qty == 1) {
           if(!op.hasClass("quantity")) {
             newClass = "quantity";

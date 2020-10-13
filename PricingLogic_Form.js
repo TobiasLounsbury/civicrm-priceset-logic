@@ -9,7 +9,7 @@ CRM.$(function($) {
    * @param caseObj
    */
   CRM.PricingLogic.refreshAssignmentList = function refreshAssignmentList(caseObj) {
-    var baseName = caseObj.attr("name");
+    let baseName = caseObj.attr("name");
     caseObj.children(".FieldsList").children(".ValueAssignment").each(function(i) {
       $(this).attr("name", baseName + "[values][" + i +"]");
       $(this).find(".PriceFieldSelect").attr("name", baseName + "[values][" + i +"][field]");
@@ -25,7 +25,7 @@ CRM.$(function($) {
    * @param caseObj
    */
   CRM.PricingLogic.rebuildCaseNames = function rebuildCaseNames(caseObj) {
-    var baseName = caseObj.attr("name");
+    let baseName = caseObj.attr("name");
     caseObj.children(".CaseType").attr("name", baseName + "[type]");
     caseObj.children(".AdvancedList").find(".TrueFunction").attr("name", baseName + "[truefunction]");
     caseObj.children(".AdvancedList").find(".FalseFunction").attr("name", baseName + "[falsefunction]");
@@ -132,7 +132,7 @@ CRM.$(function($) {
    * @returns {*}
    */
   CRM.PricingLogic.buildCaseFromData = function buildCaseFromData(caseData) {
-    var obj;
+    let obj;
     if (caseData.type == "union") {
       obj = $("#Templates .UnionCase").clone(true);
       //Set the UnionType
@@ -161,7 +161,7 @@ CRM.$(function($) {
         obj.find(".FieldCaseValue").hide();
       } else {
 
-        var field;
+        let field;
 
         //Handle Missing Locations.
         if (caseData.field.substr(-1) === "-") {
@@ -175,7 +175,7 @@ CRM.$(function($) {
         }
 
 
-        var optsObj = obj.find("select.FieldCaseOption");
+        let optsObj = obj.find("select.FieldCaseOption");
 
         if (caseData.op == "in" || caseData.op == "not-in") {
           optsObj.prop("multiple", "multiple");
@@ -183,7 +183,7 @@ CRM.$(function($) {
 
 
         //Set the options (if any)
-        var newOpts = CRM.PricingLogic.getValueOptions(field);
+        let newOpts = CRM.PricingLogic.getValueOptions(field);
         if (newOpts) {
           //TODO: fix: .FieldCaseOption
           optsObj.append(newOpts);
@@ -193,8 +193,8 @@ CRM.$(function($) {
         }
 
         //Populate and Set the operation type
-        var op = obj.find(".op").show();
-        var n = CRM.PricingLogic.getOpOptions(field, op);
+        let op = obj.find(".op").show();
+        let n = CRM.PricingLogic.getOpOptions(field, op);
         op.addClass(n.class).append(n.options);
         op.val( caseData.op );
         if (n.class == 'quantity') {
@@ -218,10 +218,10 @@ CRM.$(function($) {
     }
     //Load the Value Assignments if there are any.
     if(caseData.hasOwnProperty("values")) {
-      var vals = obj.children(".FieldsList");
-      for (var i in caseData.values) {
+      let vals = obj.children(".FieldsList");
+      for (let i in caseData.values) {
         //Create the structure from Template
-        var valObj = $("#Templates .ValueAssignment").clone(true);
+        let valObj = $("#Templates .ValueAssignment").clone(true);
 
         //Set the Field
         valObj.find(".PriceFieldSelect").val( caseData.values[i].field );
@@ -261,7 +261,7 @@ CRM.$(function($) {
    * @param trgt
    */
   CRM.PricingLogic.populatePriceFieldOption = function populatePriceFieldOption(field, trgt) {
-    for (var i in CRM.PricingLogic.PriceFields[field].values) {
+    for (let i in CRM.PricingLogic.PriceFields[field].values) {
       trgt.append("<option value='" + CRM.PricingLogic.PriceFields[field].values[i].id + "'>" + CRM.PricingLogic.PriceFields[field].values[i].label + "</option>")
     }
   }
@@ -275,8 +275,8 @@ CRM.$(function($) {
    * @returns {{options: (*|jQuery|HTMLElement), class: string}}
    */
   CRM.PricingLogic.getOpOptions = function getOpOptions(field, op) {
-    var newOptions = $(false);
-    var newClass = "";
+    let newOptions = $(false);
+    let newClass = "";
     switch(field.html_type) {
 
 
@@ -367,8 +367,8 @@ CRM.$(function($) {
     } else if (field.html_type == "state") {
       return $("#Templates .StateTemplate > optgroup").clone();
     } else if (field.hasOwnProperty("values")) {
-      var vals = "";
-      for (var i in field.values) {
+      let vals = "";
+      for (let i in field.values) {
         if ($.isPlainObject(field.values[i])) {
           vals = vals + "<option value='"+field.values[i].id+"'>" + field.values[i].label + "</option>";
         } else {
@@ -409,12 +409,12 @@ CRM.$(function($) {
   //todo: Look into refactoring this block into a tpl function
   //Load the fields and options
   //Load OptGroups for the Profiles Fields
-  for(var i in CRM.PricingLogic.Profiles) {
+  for(let i in CRM.PricingLogic.Profiles) {
     $("#Templates .FieldCase > .caseFields").append("<optgroup id='caseField_group_"+ i +"' label='" + CRM.PricingLogic.Profiles[i] + "'></optgroup>");
   }
 
   //Load Profile Fields into their corresponding optgroups
-  for(var i in CRM.PricingLogic.ProfileFields) {
+  for(let i in CRM.PricingLogic.ProfileFields) {
     $("#caseField_group_" + CRM.PricingLogic.ProfileFields[i].uf_group_id).append("<option value='" + CRM.PricingLogic.ProfileFields[i].field_name + "'>" + CRM.PricingLogic.ProfileFields[i].label + "</option>");
   }
 
@@ -422,7 +422,7 @@ CRM.$(function($) {
   $("#Templates .FieldCase > .caseFields").append("<optgroup id='caseField_price' label='" + CRM.PricingLogic.PriceTitle + "'></optgroup>");
 
   //Load the Price-Set Fields into the select
-  for(var i in CRM.PricingLogic.PriceFields) {
+  for(let i in CRM.PricingLogic.PriceFields) {
     $("#caseField_price").append("<option value='" + CRM.PricingLogic.PriceFields[i].id + "'>" + CRM.PricingLogic.PriceFields[i].label + "</option>");
   }
 
@@ -441,10 +441,10 @@ CRM.$(function($) {
   //$("#Templates .FieldCase > .FieldCaseOption").select2();
 
   //Populate the State Select Box
-  for(var g in CRM.PricingLogic.States) {
-    var sGroup = $("<optgroup id='state_group_"+ g +"' label='" + CRM.PricingLogic.States[g].value + "'></optgroup>");
+  for(let g in CRM.PricingLogic.States) {
+    let sGroup = $("<optgroup id='state_group_"+ g +"' label='" + CRM.PricingLogic.States[g].value + "'></optgroup>");
 
-    for(var s in CRM.PricingLogic.States[g].children) {
+    for(let s in CRM.PricingLogic.States[g].children) {
       sGroup.append("<option value='" + CRM.PricingLogic.States[g].children[s].key + "'>" + CRM.PricingLogic.States[g].children[s].value + "</option>");
     }
 
@@ -454,8 +454,8 @@ CRM.$(function($) {
 
   //Setup the logic that will change the price_field_value select
   $("#Templates .PriceFieldSelect").change(function(e) {
-    var t = $(this).parent().find(".PriceFieldOptionSelect");
-    var pField = $(this).val();
+    let t = $(this).parent().find(".PriceFieldOptionSelect");
+    let pField = $(this).val();
     if (CRM.PricingLogic.PriceFields[pField].hasOwnProperty("values")) {
       if(t.is(":visible")) {
         t.hide({"slide": {direction: 'left'}, done: function() {
@@ -480,23 +480,23 @@ CRM.$(function($) {
 
   //Setup the displaying of the default price for price fields with options
   $("#Templates .ValueAssignment .PriceFieldOptionSelect").change(function(e) {
-    var pField = $(this).parent().find(".PriceFieldSelect").val();
-    var newVal = CRM.PricingLogic.PriceFields[pField].values[ $(this).val() ].price;
+    let pField = $(this).parent().find(".PriceFieldSelect").val();
+    let newVal = CRM.PricingLogic.PriceFields[pField].values[ $(this).val() ].price;
     $(this).parent().find(".DefaultPrice").text( Number(newVal).toFixed(2) );
   });
 
   //Setup the logic for condition field changes
   $("#Templates .FieldCase .caseFields").change(function(e) {
-    var caseObj = $(this).parent();
-    var op = caseObj.find(".op");
-    var valsObj = caseObj.find("select.FieldCaseOption");
-    var valsDisplayObj = caseObj.find("div.FieldCaseOption");
+    let caseObj = $(this).parent();
+    let op = caseObj.find(".op");
+    let valsObj = caseObj.find("select.FieldCaseOption");
+    let valsDisplayObj = caseObj.find("div.FieldCaseOption");
 
     caseObj.removeClass("pseudotype");
 
     if ( $(this).val() == "javascript") {
       //JavaScript
-      var fval = caseObj.find(".FieldCaseValue");
+      let fval = caseObj.find(".FieldCaseValue");
       op.removeClass().addClass("op").hide({slide: 'left'});
       if (valsDisplayObj && valsDisplayObj.is(":visible")) {
         valsDisplayObj.hide({
@@ -507,7 +507,7 @@ CRM.$(function($) {
           }
         });
       }
-      var nWidth = (caseObj.find(".DeleteHandle").offset().left - ($(this).offset().left + $(this).outerWidth()) - 15);
+      let nWidth = (caseObj.find(".DeleteHandle").offset().left - ($(this).offset().left + $(this).outerWidth()) - 15);
 
       if (fval.is(":visible")) {
         fval.animate({width: nWidth});
@@ -534,13 +534,13 @@ CRM.$(function($) {
     } else {
       if ($.isNumeric($(this).val())) {
         //PriceSet Fields
-        var field = CRM.PricingLogic.PriceFields[ $(this).val() ];
+        let field = CRM.PricingLogic.PriceFields[ $(this).val() ];
       } else {
         //Core Fields
-        var field = CRM.PricingLogic.ProfileFields[ $(this).val() ];
+        let field = CRM.PricingLogic.ProfileFields[ $(this).val() ];
       }
 
-      var vals = CRM.PricingLogic.getValueOptions(field);
+      let vals = CRM.PricingLogic.getValueOptions(field);
 
       if (vals) {
         if (valsDisplayObj && valsDisplayObj.is(":visible")) {
@@ -581,7 +581,7 @@ CRM.$(function($) {
       }
 
 
-      var n = CRM.PricingLogic.getOpOptions(field, op);
+      let n = CRM.PricingLogic.getOpOptions(field, op);
 
       if (n.options.length > 0) {
         op.hide({
@@ -602,8 +602,8 @@ CRM.$(function($) {
 
   //Setup the logic for conditional operation changes
   $("#Templates .FieldCase .op").change(function(e) {
-    var caseObj = $(this).parent();
-    var valObj = caseObj.find(".FieldCaseValue");
+    let caseObj = $(this).parent();
+    let valObj = caseObj.find(".FieldCaseValue");
     switch( $(this).val() ) {
       case '=':
       case '<':
@@ -617,7 +617,7 @@ CRM.$(function($) {
         break;
 
       case 'regex':
-        var nWidth = (caseObj.find(".DeleteHandle").offset().left - ($(this).offset().left + $(this).outerWidth()) - 15);
+        let nWidth = (caseObj.find(".DeleteHandle").offset().left - ($(this).offset().left + $(this).outerWidth()) - 15);
         if (valObj.is(":visible")) {
           valObj.animate({width: nWidth});
         } else {
@@ -641,7 +641,7 @@ CRM.$(function($) {
           valObj.hide({slide: 'left'});
         }
 
-        var optsObj = caseObj.find("select.FieldCaseOption");
+        let optsObj = caseObj.find("select.FieldCaseOption");
         if (optsObj.prop("multiple")) {
           caseObj.find("div.FieldCaseOption").hide({slide: 'left', done: function() {
               optsObj.select2('destroy').prop("multiple", null).select2();
@@ -654,7 +654,7 @@ CRM.$(function($) {
         if( valObj.is(":visible") ) {
           valObj.hide({slide: 'left'});
         }
-        var optsObj = caseObj.find("select.FieldCaseOption");
+        let optsObj = caseObj.find("select.FieldCaseOption");
         if (!optsObj.prop("multiple")) {
           caseObj.find("div.FieldCaseOption").hide({slide: 'left', done: function() {
               optsObj.select2('destroy').prop("multiple", "multiple").select2().hide();
@@ -699,7 +699,7 @@ CRM.$(function($) {
 
   //Add A Union to Cases
   $(".pricesetlogic-addunion").click(function(e) {
-    var obj = $("#Templates > .UnionCase").clone(true);
+    let obj = $("#Templates > .UnionCase").clone(true);
     obj.attr("name", "cases[" + $("#Cases>.Case").size() + "]");
     $("#Cases").append( obj );
 
@@ -713,7 +713,7 @@ CRM.$(function($) {
   //Add a new single case field condition
   $(".pricesetlogic-addcase").click(function(e) {
     //This makes it so a new field condition is added directly to thefirst empty slot in a union
-    var obj = $("#Templates > .FieldCase").clone(true);
+    let obj = $("#Templates > .FieldCase").clone(true);
 
     if ($("#Cases .Slot:empty").size() > 0) {
       $("#Cases .Slot:empty").first().append( obj );
@@ -738,7 +738,7 @@ CRM.$(function($) {
       //Minimize the editor
       $("#BottomButtons").hide().appendTo("#PriceSetLogicSettings");
       $("#ValueEditor h3").css({"position": "relative"});
-      var pd = $("#ValueEditor").prop("originalSize");
+      let pd = $("#ValueEditor").prop("originalSize");
       $("#ValueEditor").animate(pd, function() {
         $("#ValueEditor").removeClass("CVMax");
         $("#ValueEditor").appendTo("#ValueAnchor");
@@ -752,7 +752,7 @@ CRM.$(function($) {
     } else {
       //Maximize the window
       //store the original position height and width;
-      var pd = $("#ValueEditor").offset();
+      let pd = $("#ValueEditor").offset();
       pd.height = $("#ValueEditor").height();
       pd.width = $("#ValueEditor").width();
       $("#ValueEditor").prop("originalSize", pd);
@@ -784,7 +784,7 @@ CRM.$(function($) {
   });
 
   //Load the current cases and values
-  for (var i in CRM.PricingLogic.Cases) {
+  for (let i in CRM.PricingLogic.Cases) {
     $("#Cases").append( CRM.PricingLogic.buildCaseFromData(CRM.PricingLogic.Cases[i]) );
   }
 
@@ -798,9 +798,9 @@ CRM.$(function($) {
   //This is a "hack" to handle problems with the javascript input boxes not resizing
   // on page load because this is called before rendering.
   $("#Cases .javascript,#Cases .regex").each(function() {
-    var obj = $(this);
+    let obj = $(this);
     setTimeout(function() {
-      var b = obj.prevAll(":visible:first").offset().left + obj.prevAll(":visible:first").outerWidth();
+      let b = obj.prevAll(":visible:first").offset().left + obj.prevAll(":visible:first").outerWidth();
       obj.css('width', obj.parent().find(".DeleteHandle").offset().left - b - 15);
     }, 200);
   });
@@ -817,7 +817,7 @@ CRM.$(function($) {
 
 // function to show/hide settings
 function PriceSetLogicSettingsBlock() {
-  var psm_status = 0;
+  let psm_status = 0;
   if (CRM.$('#pricesetlogic_active').prop('checked')) {
     psm_status = 1;
   }

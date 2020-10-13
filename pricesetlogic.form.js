@@ -532,12 +532,13 @@ CRM.$(function($) {
         });
       }
     } else {
+      let field;
       if ($.isNumeric($(this).val())) {
         //PriceSet Fields
-        let field = CRM.PricingLogic.PriceFields[ $(this).val() ];
+        field = CRM.PricingLogic.PriceFields[ $(this).val() ];
       } else {
         //Core Fields
-        let field = CRM.PricingLogic.ProfileFields[ $(this).val() ];
+        field = CRM.PricingLogic.ProfileFields[ $(this).val() ];
       }
 
       let vals = CRM.PricingLogic.getValueOptions(field);

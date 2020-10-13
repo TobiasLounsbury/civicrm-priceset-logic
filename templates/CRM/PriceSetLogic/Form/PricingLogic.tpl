@@ -158,10 +158,10 @@
 
 
 <!--// [Include Custom CSS] //-->
-{crmStyle ext=com.tobiaslounsbury.pricesetlogic file=PricingLogic_Form.css}
+{crmStyle ext=com.tobiaslounsbury.pricesetlogic file=pricesetlogic.form.css}
 
 <!--// [Include Custom JS] //-->
-{crmScript ext=com.tobiaslounsbury.pricesetlogic file=PricingLogic_Form.js}
+{crmScript ext=com.tobiaslounsbury.pricesetlogic file=pricesetlogic.form.js}
 
 <!--//
 I'm including some css here because it needs to be wrapped in

@@ -8,7 +8,7 @@ CRM.$(function($) {
    *
    * @param caseObj
    */
-  function refreshAssignmentList(caseObj) {
+  CRM.PricingLogic.refreshAssignmentList = function refreshAssignmentList(caseObj) {
     var baseName = caseObj.attr("name");
     caseObj.children(".FieldsList").children(".ValueAssignment").each(function(i) {
       $(this).attr("name", baseName + "[values][" + i +"]");
@@ -24,7 +24,7 @@ CRM.$(function($) {
    *
    * @param caseObj
    */
-  function rebuildCaseNames(caseObj) {
+  CRM.PricingLogic.rebuildCaseNames = function rebuildCaseNames(caseObj) {
     var baseName = caseObj.attr("name");
     caseObj.children(".CaseType").attr("name", baseName + "[type]");
     caseObj.children(".AdvancedList").find(".TrueFunction").attr("name", baseName + "[truefunction]");
@@ -34,7 +34,7 @@ CRM.$(function($) {
       caseObj.children(".UnionType").attr("name", baseName + "[op]");
       //Handle "renaming" child cases
       caseObj.children(".ChildCases").children(".Case").each(function(index, child) {
-        rebuildCaseNames($(child).attr("name", baseName + "[slot][" + index + "]"));
+        CRM.PricingLogic.rebuildCaseNames($(child).attr("name", baseName + "[slot][" + index + "]"));
       });
     }
 
@@ -50,27 +50,27 @@ CRM.$(function($) {
    * Rebuilds the names for the sub-cases inside a union
    * to preserve order
    */
-  function rebuildNames() {
+  CRM.PricingLogic.rebuildNames = function rebuildNames() {
     $("#Cases .Slot").removeClass("empty");
     $("#Cases .Slot:empty").addClass("empty");
 
     $("#Cases > .Case").each(function(i) {
       $(this).attr("name", "cases[" + i + "]");
-      rebuildCaseNames( $(this) );
-      refreshAssignmentList( $(this) );
+      CRM.PricingLogic.rebuildCaseNames( $(this) );
+      CRM.PricingLogic.refreshAssignmentList( $(this) );
     });
   }
 
   /**
    * Wrappper to refresh the sortable lists after adding items
    */
-  function refreshSortables() {
+  CRM.PricingLogic.refreshSortables = function refreshSortables() {
     $("#Cases, #Cases .Slot").sortable('refresh');
     $("#Cases .FieldsList").sortable('refresh');
   }
 
 
-  function handleSubSectionVisibility() {
+  CRM.PricingLogic.handleSubSectionVisibility = function handleSubSectionVisibility() {
     $("#Cases > .Case > .FieldsList, #Cases > .Case > .AdvancedList").slideDown();
     $("#Cases > .Case .Case .FieldsList, #Cases > .Case .Case .AdvancedList").slideUp();
     $("#Cases > .Case.pseudotype .FieldsList, #Cases > .Case.pseudotype .AdvancedList").slideUp();
@@ -86,7 +86,7 @@ CRM.$(function($) {
    *
    * @param selector
    */
-  function makeCaseSortable(selector) {
+  CRM.PricingLogic.makeCaseSortable = function makeCaseSortable(selector) {
     //Make the Cases sortable
     $(selector).sortable({
       handle: ".CaseGrabHandle",
@@ -102,11 +102,11 @@ CRM.$(function($) {
           $(event.target).closest(".Case").find(".FieldsList").append(ui.item.find(".ValueAssignment"));
           ui.item.find(".ValueAssignment").remove();
         }
-        handleSubSectionVisibility();
+        CRM.PricingLogic.handleSubSectionVisibility();
       },
       stop: function( event, ui ) {
         //Refresh the names
-        rebuildNames();
+        CRM.PricingLogic.rebuildNames();
       }
     });
 
@@ -119,7 +119,7 @@ CRM.$(function($) {
       connectWith: "#Cases .FieldsList",
       revert: true,
       receive: function( event, ui ) {
-        refreshAssignmentList( $(event.target) );
+        CRM.PricingLogic.refreshAssignmentList( $(event.target) );
       }
     });
   }
@@ -131,7 +131,7 @@ CRM.$(function($) {
    * @param caseData
    * @returns {*}
    */
-  function buildCaseFromData(caseData) {
+  CRM.PricingLogic.buildCaseFromData = function buildCaseFromData(caseData) {
     var obj;
     if (caseData.type == "union") {
       obj = $("#Templates .UnionCase").clone(true);
@@ -141,7 +141,7 @@ CRM.$(function($) {
       //recursively load Child Cases
       if(caseData.hasOwnProperty("slot")) {
         for(s in caseData.slot) {
-          obj.children(".ChildCases").append(buildCaseFromData(caseData.slot[s]));
+          obj.children(".ChildCases").append(CRM.PricingLogic.buildCaseFromData(caseData.slot[s]));
         }
       }
 
@@ -183,7 +183,7 @@ CRM.$(function($) {
 
 
         //Set the options (if any)
-        var newOpts = getValueOptions(field);
+        var newOpts = CRM.PricingLogic.getValueOptions(field);
         if (newOpts) {
           //TODO: fix: .FieldCaseOption
           optsObj.append(newOpts);
@@ -194,7 +194,7 @@ CRM.$(function($) {
 
         //Populate and Set the operation type
         var op = obj.find(".op").show();
-        var n = getOpOptions(field, op);
+        var n = CRM.PricingLogic.getOpOptions(field, op);
         op.addClass(n.class).append(n.options);
         op.val( caseData.op );
         if (n.class == 'quantity') {
@@ -228,7 +228,7 @@ CRM.$(function($) {
 
         //Populate the Field Options
         if (CRM.PricingLogic.PriceFields[caseData.values[i].field].hasOwnProperty("values")) {
-          populatePriceFieldOption(caseData.values[i].field, valObj.find(".PriceFieldOptionSelect"));
+          CRM.PricingLogic.populatePriceFieldOption(caseData.values[i].field, valObj.find(".PriceFieldOptionSelect"));
           valObj.find(".PriceFieldOptionSelect").val(caseData.values[i].option).show();
           valObj.find(".DefaultPrice").text(Number(CRM.PricingLogic.PriceFields[caseData.values[i].field].values[caseData.values[i].option].price).toFixed(2));
         } else {
@@ -260,7 +260,7 @@ CRM.$(function($) {
    * @param field
    * @param trgt
    */
-  function populatePriceFieldOption(field, trgt) {
+  CRM.PricingLogic.populatePriceFieldOption = function populatePriceFieldOption(field, trgt) {
     for (var i in CRM.PricingLogic.PriceFields[field].values) {
       trgt.append("<option value='" + CRM.PricingLogic.PriceFields[field].values[i].id + "'>" + CRM.PricingLogic.PriceFields[field].values[i].label + "</option>")
     }
@@ -274,7 +274,7 @@ CRM.$(function($) {
    * @param op
    * @returns {{options: (*|jQuery|HTMLElement), class: string}}
    */
-  function getOpOptions(field, op) {
+  CRM.PricingLogic.getOpOptions = function getOpOptions(field, op) {
     var newOptions = $(false);
     var newClass = "";
     switch(field.html_type) {
@@ -359,7 +359,7 @@ CRM.$(function($) {
    * @param field
    * @returns {*}
    */
-  function getValueOptions(field) {
+  CRM.PricingLogic.getValueOptions = function getValueOptions(field) {
     if (field.html_type == "radio" && field.hasOwnProperty("data_type") && (field.data_type == "binary" || field.data_type == "boolean")) {
       return "<option value='1'>" + ts("Yes") + "</option><option value='0'>" + ts("No") + "</option>";
     } else if (field.html_type == "country") {
@@ -385,7 +385,7 @@ CRM.$(function($) {
    * This function is used when you add a ase to scroll to
    * the bottom of the editor and reveal the new case.
    */
-  function scrollToEditorBottom() {
+  CRM.PricingLogic.scrollToEditorBottom = function scrollToEditorBottom() {
     if ($("#ValueEditor").hasClass("CVMax")) {
       $("#ValueEditor").animate({ scrollTop: $("#ValueEditor").height() }, "fast");
     } else {
@@ -460,13 +460,13 @@ CRM.$(function($) {
       if(t.is(":visible")) {
         t.hide({"slide": {direction: 'left'}, done: function() {
             t.find("option,optgroup").remove();
-            populatePriceFieldOption(pField, t);
+            CRM.PricingLogic.populatePriceFieldOption(pField, t);
             t.show({"slide": {direction: 'left'}});
             t.change();
           }});
       } else {
         t.find("option,optgroup").remove();
-        populatePriceFieldOption(pField, t);
+        CRM.PricingLogic.populatePriceFieldOption(pField, t);
         t.show({"slide": {direction: 'left'}});
         t.change();
       }
@@ -540,7 +540,7 @@ CRM.$(function($) {
         var field = CRM.PricingLogic.ProfileFields[ $(this).val() ];
       }
 
-      var vals = getValueOptions(field);
+      var vals = CRM.PricingLogic.getValueOptions(field);
 
       if (vals) {
         if (valsDisplayObj && valsDisplayObj.is(":visible")) {
@@ -581,7 +581,7 @@ CRM.$(function($) {
       }
 
 
-      var n = getOpOptions(field, op);
+      var n = CRM.PricingLogic.getOpOptions(field, op);
 
       if (n.options.length > 0) {
         op.hide({
@@ -597,7 +597,7 @@ CRM.$(function($) {
       }
     }
 
-    handleSubSectionVisibility();
+    CRM.PricingLogic.handleSubSectionVisibility();
   });
 
   //Setup the logic for conditional operation changes
@@ -692,8 +692,8 @@ CRM.$(function($) {
   $(".AddButton").click(function(e) {
     $(this).parent().append( $("#Templates > .ValueAssignment").clone(true) );
     $(this).parent().append($(this));
-    refreshSortables();
-    refreshAssignmentList( $(this).closest(".Case") );
+    CRM.PricingLogic.refreshSortables();
+    CRM.PricingLogic.refreshAssignmentList( $(this).closest(".Case") );
     return e.preventDefault();
   });
 
@@ -703,10 +703,10 @@ CRM.$(function($) {
     obj.attr("name", "cases[" + $("#Cases>.Case").size() + "]");
     $("#Cases").append( obj );
 
-    makeCaseSortable( obj.add( obj.find(".Slot") ) );
-    refreshSortables();
-    rebuildNames();
-    scrollToEditorBottom();
+    CRM.PricingLogic.makeCaseSortable( obj.add( obj.find(".Slot") ) );
+    CRM.PricingLogic.refreshSortables();
+    CRM.PricingLogic.rebuildNames();
+    CRM.PricingLogic.scrollToEditorBottom();
     return e.preventDefault();
   });
 
@@ -722,11 +722,11 @@ CRM.$(function($) {
       $("#Cases").append( obj );
     }
 
-    makeCaseSortable( obj );
-    refreshSortables();
-    rebuildNames();
+    CRM.PricingLogic.makeCaseSortable( obj );
+    CRM.PricingLogic.refreshSortables();
+    CRM.PricingLogic.rebuildNames();
     obj.find(".caseFields").change();
-    scrollToEditorBottom();
+    CRM.PricingLogic.scrollToEditorBottom();
     return e.preventDefault();
   });
 
@@ -785,7 +785,7 @@ CRM.$(function($) {
 
   //Load the current cases and values
   for (var i in CRM.PricingLogic.Cases) {
-    $("#Cases").append( buildCaseFromData(CRM.PricingLogic.Cases[i]) );
+    $("#Cases").append( CRM.PricingLogic.buildCaseFromData(CRM.PricingLogic.Cases[i]) );
   }
 
   //Hide the values section for nested Cases
@@ -806,13 +806,13 @@ CRM.$(function($) {
   });
 
   //Rebuild the name structure
-  rebuildNames();
+  CRM.PricingLogic.rebuildNames();
 
   //Create the initial Sortables
-  makeCaseSortable("#Cases, #Cases .Slot");
+  CRM.PricingLogic.makeCaseSortable("#Cases, #Cases .Slot");
 
   //Handle hiding and showing subsections on page load.
-  handleSubSectionVisibility();
+  CRM.PricingLogic.handleSubSectionVisibility();
 });
 
 // function to show/hide settings

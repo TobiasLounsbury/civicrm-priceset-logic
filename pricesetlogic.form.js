@@ -602,6 +602,7 @@ CRM.$(function($) {
 
   //Setup the logic for conditional operation changes
   $("#Templates .FieldCase .op").change(function(e) {
+    let optsObj;
     let caseObj = $(this).parent();
     let valObj = caseObj.find(".FieldCaseValue");
     switch( $(this).val() ) {
@@ -641,7 +642,7 @@ CRM.$(function($) {
           valObj.hide({slide: 'left'});
         }
 
-        let optsObj = caseObj.find("select.FieldCaseOption");
+        optsObj = caseObj.find("select.FieldCaseOption");
         if (optsObj.prop("multiple")) {
           caseObj.find("div.FieldCaseOption").hide({slide: 'left', done: function() {
               optsObj.select2('destroy').prop("multiple", null).select2();
@@ -654,7 +655,7 @@ CRM.$(function($) {
         if( valObj.is(":visible") ) {
           valObj.hide({slide: 'left'});
         }
-        let optsObj = caseObj.find("select.FieldCaseOption");
+        optsObj = caseObj.find("select.FieldCaseOption");
         if (!optsObj.prop("multiple")) {
           caseObj.find("div.FieldCaseOption").hide({slide: 'left', done: function() {
               optsObj.select2('destroy').prop("multiple", "multiple").select2().hide();
@@ -712,7 +713,7 @@ CRM.$(function($) {
 
   //Add a new single case field condition
   $(".pricesetlogic-addcase").click(function(e) {
-    //This makes it so a new field condition is added directly to thefirst empty slot in a union
+    //This makes it so a new field condition is added directly to the first empty slot in a union
     let obj = $("#Templates > .FieldCase").clone(true);
 
     if ($("#Cases .Slot:empty").size() > 0) {

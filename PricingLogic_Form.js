@@ -279,17 +279,22 @@ CRM.$(function($) {
     var newClass = "";
     switch(field.html_type) {
 
-      case 'number':
-      case 'tel':
-      case 'email':
-      case 'text':
-      case 'hidden':
+
+      case 'core':
+        CRM.alert(ts("Certain core fields are not yet fully supported."), ts("Warning"), "warning");
       case 'range':
       case 'date':
       case 'datetime-local':
       case 'month':
       case 'week':
       case 'color':
+      case 'number':
+        CRM.alert(ts("You are using a field that is not yet fully supported. They are treated as text boxes, and may lack some functionality or not behave as expected."), ts("Warning"), "warning");
+      case 'phone':
+      case 'tel':
+      case 'email':
+      case 'text':
+      case 'hidden':
         if(field.type == "price" && field.is_enter_qty == 1) {
           if(!op.hasClass("quantity")) {
             newClass = "quantity";
@@ -304,7 +309,7 @@ CRM.$(function($) {
         break;
 
       case 'multi-select':
-        alert(ts("Please be aware: Multi-select boxes are only partially supported."));
+        CRM.alert(ts("Please be aware: Multi-select boxes are only partially supported."), ts("Warning"), "warning");
       case 'autocomplete-select':
       case 'select':
         if(!op.hasClass("select")) {
@@ -343,7 +348,7 @@ CRM.$(function($) {
 
       default:
         console.log(field.html_type);
-        alert(ts("Something has gone wrong, please contact the your administrator or the plugin author"));
+        CRM.alert(ts("Something has gone wrong, please contact the your administrator or the plugin author"), ts("Unknown Type") + ": " + field.html_type, "error");
     }
     return {'options': newOptions, 'class': newClass};
   }
@@ -824,7 +829,7 @@ function PriceSetLogicSettingsBlock() {
   }).done(function(result) {
     // do something
     if (result.is_error) {
-      CRM.alert(result.error_message, "error");
+      CRM.alert(result.error_message, ts("Error"), "error");
     } else {
       if (CRM.$('#pricesetlogic_active').prop('checked')) {
         CRM.$('#PriceSetLogicSettings').slideDown("fast");

@@ -13,6 +13,10 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
    * @throws CiviCRM_API3_Exception
    */
   static function getSet($PageType, $PageID) {
+    if (!$PageID) {
+      return false;
+    }
+
     $result = civicrm_api3('PriceSetLogic', 'Get', array(
       'page_type' => $PageType,
       'page_id' => $PageID
@@ -234,7 +238,7 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
 
     $fieldName = (is_numeric($condition['field'])) ? "price_".$condition['field'] : $condition['field'];
     $fieldVal = $form->_submitValues[$fieldName];
-    
+
     switch( $condition['op'] ) {
       case '=':
         return ($fieldVal == $condition['value']);

@@ -29,12 +29,18 @@
         <div id="ValueAnchor">
             <div id="ValueEditor" class="crm-container CVMin">
                 <h3 class="pricesetlogic-section">{ts}Custom Values{/ts}:
-                    <a class="crm-hover-button" id="MinMax" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
-                    <a class="crm-hover-button" id="AddUnion" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
-                    <a class="crm-hover-button" id="AddCase" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-minmax" id="MinMaxTop" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
+                    <a class="crm-hover-button pricesetlogic-addunion" id="AddUnionTop" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-addcase" id="AddCaseTop" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
                     <div style="clear: both;"></div>
                 </h3>
                 <div id="Cases"></div>
+                <h3 class="pricesetlogic-section pricesetlogic-bottom-section">
+                    <a class="crm-hover-button pricesetlogic-minmax" id="MinMaxBottom" title="{ts}Maximize the editor{/ts}"><span class="icon ui-icon-extlink"></span></a>
+                    <a class="crm-hover-button pricesetlogic-addunion" id="AddUnionBottom" href="#" title="{ts}Add a new set of conditions{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Set{/ts}</a>
+                    <a class="crm-hover-button pricesetlogic-addcase" id="AddCaseBottom" href="#" title="{ts}Add a new single field condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Condition{/ts}</a>
+                    <div style="clear: both;"></div>
+                </h3>
             </div>
         </div>
 
@@ -77,12 +83,11 @@
         <div class="GrabHandle CaseGrabHandle"><span class="icon ui-icon-grip-dotted-vertical"></span></div>
         <a class="DeleteHandle crm-hover-button" href="#" title="{ts}Remove this custom price from the list{/ts}"><span class="icon ui-icon-close"></span></a>
         <input type="hidden" class="CaseType" value="union" />
-        <div class="Slot Slot1"></div>
         <select class="UnionType">
-            <option value="and">AND</option>
-            <option value="or">OR</option>
+            <option value="and">{ts}AND - All conditions must be true{/ts}</option>
+            <option value="or">{ts}OR - Any one condition must be true{/ts}</option>
         </select>
-        <div class="Slot Slot2"></div>
+        <div class="Slot ChildCases"></div>
         <div class="FieldsList">
             <a class="AddButton crm-hover-button" href="#" title="{ts}Add a new Value to this Condition{/ts}"><span class="icon ui-icon-plus"></span>{ts}Add Field{/ts}</a>
         </div>
@@ -153,10 +158,10 @@
 
 
 <!--// [Include Custom CSS] //-->
-{crmStyle ext=com.tobiaslounsbury.pricesetlogic file=PricingLogic_Form.css}
+{crmStyle ext=com.tobiaslounsbury.pricesetlogic file=pricesetlogic.form.css}
 
 <!--// [Include Custom JS] //-->
-{crmScript ext=com.tobiaslounsbury.pricesetlogic file=PricingLogic_Form.js}
+{crmScript ext=com.tobiaslounsbury.pricesetlogic file=pricesetlogic.form.js}
 
 <!--//
 I'm including some css here because it needs to be wrapped in

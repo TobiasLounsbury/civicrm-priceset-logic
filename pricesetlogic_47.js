@@ -18,6 +18,12 @@ CRM.$(function ($) {
       case 'select':
         //Do for Select Boxes
         obj = $("#price_" + value.field);
+
+        //If we can't find the object in question we can't proceed.
+        if(obj.length <= 0) {
+          break;
+        }
+
         var optObj = obj.find("option[value='" + value.option + "']");
         //Fetch the price data
         eval('var option = ' + obj.attr('price'));
@@ -51,6 +57,12 @@ CRM.$(function ($) {
         if(obj.length < 1) {
           obj = $("#price_" + value.field + "_" + value.option);
         }
+
+        //If we can't find the object in question we can't proceed.
+        if(obj.length <= 0) {
+          break;
+        }
+
         eval('var option = ' + obj.attr('price'));
         ele = option[0];
 
@@ -82,6 +94,12 @@ CRM.$(function ($) {
 
         //Do For Quantity Fields
         obj = $("#price_" + value.field);
+
+        //If we can't find the object in question we can't proceed.
+        if(obj.length <= 0) {
+          break;
+        }
+
         //Parse the price object
         eval('var option = ' + obj.attr('price'));
         var ele = option[0];

@@ -94,6 +94,7 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
     $ProfileFields = array();
     $customFields = array();
     $optionsToFetch = array();
+    $importableFields = array();
 
     if (!empty($profiles) && !is_null($profiles[0])) {
       //gender_id, communication_style_id, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
@@ -104,7 +105,7 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
 
       $result = civicrm_api3('UFField', 'get', array(
         'sequential' => 1,
-        'return' => "field_name,label,location_type_id,phone_type_id,uf_group_id",
+        'return' => "field_name,label,location_type_id,phone_type_id,uf_group_id,html_type",
         'uf_group_id' => array('IN' => $profiles),
         'field_type' => array('!=' => "Formatting"),
         'options' => array('sort' => "uf_group_id"),
@@ -139,9 +140,26 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
           $ProfileFields[$field['field_name']]['html_type'] = "email";
           $ProfileFields[$field['field_name']]['type'] = "email";
         } else {
-          //$coreFields[] = $field['field_name'];
-          $ProfileFields[$field['field_name']]['html_type'] = "text";
+
+
+          //Get some field metadata if we don't have it.
+          if(empty($importableFields)) {
+            $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, TRUE, FALSE, TRUE, TRUE);
+          }
+
+          $ProfileFields[$field['field_name']]['html_type'] = strtolower($importableFields[$field['field_name']]["html"]["type"]);
           $ProfileFields[$field['field_name']]['type'] = "core";
+
+          if (array_key_exists("pseudoconstant", $importableFields[$field['field_name']])) {
+            $result = civicrm_api3('OptionValue', 'get', array(
+                'sequential' => 1,
+                'return' => array("id", "label", "value", "name", "weight"),
+                'option_group_id' => $importableFields[$field['field_name']]['pseudoconstant']['optionGroupName'],
+                'is_active' => 1,
+            ));
+            $ProfileFields[$field['field_name']]['values'] = $result['values'];
+          }
+
         }
       }
 
@@ -181,7 +199,8 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
       //Shove the options into their respective fields
       foreach ($result['values'] as $option) {
         foreach ($optionsToFetch[$option['option_group_id']] as $key)
-          $ProfileFields[$key]['values'][] = $option;
+          $ProfileFields[$key]['values'][$option['id']] = $option;
+          //$ProfileFields[$key]['values'][] = $option;
       }
     }
 
@@ -194,8 +213,10 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
    * @param $case
    * @param $form
    * @param $pageType
+   * @param $set
+   * @return boolean
    */
-  static function evaluateCase($case, $form, $pageType) {
+  static function evaluateCase($case, &$form, $pageType, &$set) {
     if($case['type'] == 'union') {
       if ($case['op'] == 'and') {
         $result = true;
@@ -203,7 +224,7 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
           if(!$result) {
             return false;
           }
-          $result = $result && CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($slot, $form, $pageType);
+          $result = $result && CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($slot, $form, $pageType, $set);
         }
         return $result;
       } elseif ($case['op'] == 'or') {
@@ -212,12 +233,12 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
           if($result) {
             return true;
           }
-          $result = $result || CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($slot, $form, $pageType);
+          $result = $result || CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($slot, $form, $pageType, $set);
         }
         return $result;
       }
     } elseif ($case['type'] == 'condition') {
-      return CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($case, $form, $pageType);
+      return CRM_PriceSetLogic_BAO_PriceSetLogic::evaluateCondition($case, $form, $pageType, $set);
     }
     return false;
   }
@@ -229,12 +250,23 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
    * @param $condition
    * @param $form
    * @param $pageType
+   * @param $set
+   * @return boolean
    */
-  static function evaluateCondition($condition, $form, $pageType) {
+  static function evaluateCondition($condition, &$form, $pageType, &$set) {
 
+    //Short circuit the evaluation for civiDiscount codes.
+    //They are always true because they aren't really part of Pricing Logic
+    //but a pseudo-condition used to help the two projects play nice.
+    if($condition['field'] == "cividiscount") {
+      return true;
+    }
+
+    //Call the backend evaluation function for a javascript condition
     if($condition['field'] == "javascript") {
       return CRM_PriceSetLogic_BAO_PriceSetLogic::javascriptCondition($condition['value'], $form, $pageType);
     }
+
 
     $fieldName = (is_numeric($condition['field'])) ? "price_".$condition['field'] : $condition['field'];
     $fieldVal = $form->_submitValues[$fieldName];
@@ -262,7 +294,15 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
         if(is_array($condition['option'])) {
           $condition['option'] = $condition['option'][0];
         }
-        return (array_key_exists($condition['option'], $fieldVal) && $fieldVal[$condition['option']] == 1);
+
+        if(!is_numeric($condition['field'])) {
+          $key = $set['profileFields'][$fieldName]['values'][$condition['option']]['value'];
+        } else {
+          $key = $condition['option'];
+        }
+
+
+        return (array_key_exists($key, $fieldVal) && $fieldVal[$key] == 1);
       case 'not-checked':
         if(is_array($condition['option'])) {
           $condition['option'] = $condition['option'][0];

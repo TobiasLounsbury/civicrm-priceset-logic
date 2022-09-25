@@ -9,9 +9,7 @@ CRM.$(function ($) {
   /***************[  ]***************/
   CRM.PricingLogic.ChangePrice = function (value) {
     //console.log(value);
-    let obj;
-    let newPrice;
-    let priceText;
+    let obj, newPrice, priceText, option, ele;
     let format$ = CRM.formatMoney || formatMoney;
 
     switch (CRM.PricingLogic.AllPriceFields[value.field].html_type) {
@@ -27,7 +25,7 @@ CRM.$(function ($) {
 
         let optObj = obj.find("option[value='" + value.option + "']");
         //Fetch the price data
-        eval('let option = ' + obj.attr('price'));
+        option = JSON.parse(obj.attr('price'));
         newPrice = parseFloat(value.price);
 
         //Fetch the list of additional price data
@@ -64,7 +62,7 @@ CRM.$(function ($) {
           break;
         }
 
-        eval('let option = ' + obj.attr('price'));
+        option = JSON.parse(obj.attr('price'));
         ele = option[0];
 
         newPrice = parseFloat(value.price);
@@ -102,8 +100,8 @@ CRM.$(function ($) {
         }
 
         //Parse the price object
-        eval('let option = ' + obj.attr('price'));
-        let ele = option[0];
+        option = JSON.parse(obj.attr('price'));
+        ele = option[0];
         //set the new price.
         newPrice = parseFloat(value.price);
         obj.attr('price', '["' + ele + '", "' + newPrice.toFixed(2) + optionSep + optionSep + '"]');

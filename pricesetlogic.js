@@ -17,7 +17,7 @@ CRM.$(function ($) {
       return true;
     }
 
-    var fieldVal,fieldType, optionValue;
+    let fieldVal,fieldType, optionValue;
     //This is a Price Field
     if ($.isNumeric(caseData.field)) {
       fieldType = "price";
@@ -134,14 +134,14 @@ CRM.$(function ($) {
         return !(fieldVal);
       case 'selected':
         if(fieldType == "profile") {
-          var optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
+          let optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
           return (fieldVal == optVal);
         } else {
           return (fieldVal == caseData.option[0]);
         }
       case 'not-selected':
         if(fieldType == "profile") {
-          var optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
+          let optVal = CRM._.where(CRM.PricingLogic.ProfileFields[caseData.field].values, {"id": caseData.option[0]})[0].value;
           return (fieldVal != optVal);
         } else {
           return (fieldVal != caseData.option[0]);
@@ -166,7 +166,7 @@ CRM.$(function ($) {
 
   /***************[  ]***************/
   CRM.PricingLogic.EvaluateCase = function (caseData) {
-    var result, s;
+    let result, s;
     if(caseData.type == "union") {
       if (caseData.op == "and") {
         result = true;
@@ -203,11 +203,11 @@ CRM.$(function ($) {
    * This function creates a unique value for use as an array key
    * that identifies a price field/option pair.
    *
-   * @param priceField
+   * @param priceFields
    */
   CRM.PricingLogic.makePriceFieldList = function(priceFields) {
-    var fieldList = {};
-    for(var i in priceFields) {
+    let fieldList = {};
+    for(let i in priceFields) {
       if(priceFields[i].hasOwnProperty("option")) {
         fieldList[priceFields[i].field + "_" + priceFields[i].option] = priceFields[i];
       } else {
@@ -270,12 +270,12 @@ CRM.$(function ($) {
    */
   CRM.PricingLogic.EvaluateCases = function () {
 
-    var cases = Object.keys(CRM.PricingLogic.Cases);
+    let cases = Object.keys(CRM.PricingLogic.Cases);
 
-    var toDefault = {};
-    var alreadySet = {};
+    let toDefault = {};
+    let alreadySet = {};
 
-    for (var i in cases) {
+    for (let i in cases) {
       if(CRM.PricingLogic.Cases.hasOwnProperty(cases[i])) {
         if (CRM.PricingLogic.EvaluateCase( CRM.PricingLogic.Cases[cases[i]] )) {
           //todo: Some sort of Optimization
@@ -296,7 +296,7 @@ CRM.$(function ($) {
       }
     }
 
-    for(i in toDefault) {
+    for(let i in toDefault) {
       if(alreadySet.hasOwnProperty(i)) {
         delete toDefault[i];
       }
@@ -306,21 +306,21 @@ CRM.$(function ($) {
   };
 
   //reset the price calculation functions for all the price fields we may touch
-  for(var i in CRM.PricingLogic.PriceFields) {
+  for(let i in CRM.PricingLogic.PriceFields) {
     CRM.PricingLogic.resetPricing(CRM.PricingLogic.PriceFields[i]);
   }
 
 
   //Now set up all of our triggers
-  var sels = [];
-  for(i in CRM.PricingLogic.TriggerFields) {
+  let sels = [];
+  for(let i in CRM.PricingLogic.TriggerFields) {
 
     if(i.substring(0, 5) === "price") {
-      var pfid = i.substring(6);
+      let pfid = i.substring(6);
       switch (CRM.PricingLogic.AllPriceFields[pfid].html_type) {
         case "checkbox":
           //checkboxes
-          for (var o in CRM.PricingLogic.TriggerFields[i]) {
+          for (let o in CRM.PricingLogic.TriggerFields[i]) {
             sels.push("#" + i + "_" + CRM.PricingLogic.TriggerFields[i][o]);
           }
 
@@ -351,8 +351,8 @@ CRM.$(function ($) {
         //Checkboxes
         case "checkbox":
           if (CRM.PricingLogic.ProfileFields[i].type == "custom") {
-            for(var o in CRM.PricingLogic.TriggerFields[i]) {
-              optionValue = CRM._.where(CRM.PricingLogic.ProfileFields[i].values, {"id": CRM.PricingLogic.TriggerFields[i][o]})[0].value;
+            for(let o in CRM.PricingLogic.TriggerFields[i]) {
+              let optionValue = CRM._.where(CRM.PricingLogic.ProfileFields[i].values, {"id": CRM.PricingLogic.TriggerFields[i][o]})[0].value;
               sels.push("input[id='" + i + "_" + optionValue + "']");
             }
           } else {
@@ -369,7 +369,7 @@ CRM.$(function ($) {
     }
   }
 
-  sel = sels.join(",");
+  let sel = sels.join(",");
   $(sel).change(CRM.PricingLogic.TriggerEventWatcher);
 
 

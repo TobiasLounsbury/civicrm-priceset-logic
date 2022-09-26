@@ -10,7 +10,12 @@ CRM.$(function ($) {
   CRM.PricingLogic.ChangePrice = function (value) {
     //console.log(value);
     let obj, newPrice, priceText, option, ele;
-    let format$ = CRM.formatMoney || formatMoney;
+    let format$ = (amount) => {
+      if (typeof formatMoney === "function") {
+        return symbol + " " + formatMoney(amount, 2, window.separator, window.thousandMarker);
+      }
+      return CRM.formatMoney(amount);
+    };
 
     switch (CRM.PricingLogic.AllPriceFields[value.field].html_type) {
 
@@ -36,8 +41,7 @@ CRM.$(function ($) {
         //Display the Price for the Option
         let field_name = optObj.text();
         field_name = field_name.substring(0, field_name.indexOf('-')).trim();
-        priceText = format$(newPrice, 2, separator, thousandMarker);
-        optObj.text(field_name + " - " + symbol + " " + priceText);
+        optObj.text(field_name + " - " + format$(newPrice));
 
         //Save the update price data
         obj.attr("price", JSON.stringify(option));
@@ -70,7 +74,7 @@ CRM.$(function ($) {
         //set the data-amount
         obj.attr('data-amount', newPrice);
 
-        priceText = symbol + " " + format$(newPrice, 2, window.separator, window.thousandMarker);
+        priceText = format$(newPrice);
 
         if (obj.attr("type") == "radio") {
 
@@ -113,7 +117,7 @@ CRM.$(function ($) {
         //set the line total
         obj.attr("line_raw_total", rawTotal);
 
-        priceText = symbol + " " + format$(newPrice, 2, window.separator, window.thousandMarker);
+        priceText = symbol + " " + format$(newPrice);
         $("#price_" + value.field).parent().find("span.price-field-amount").text(priceText);
         obj.keyup();
         break;

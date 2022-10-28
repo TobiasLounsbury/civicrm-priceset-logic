@@ -17,10 +17,14 @@ class CRM_PriceSetLogic_BAO_PriceSetLogic {
       return false;
     }
 
-    $result = civicrm_api3('PriceSetLogic', 'Get', array(
-      'page_type' => $PageType,
-      'page_id' => $PageID
-    ));
+    try {
+      $result = civicrm_api3('PriceSetLogic', 'Get', array(
+        'page_type' => $PageType,
+        'page_id' => $PageID
+      ));
+    } catch (CRM_Core_Exception $exception) {
+      return false;
+    }
 
     if ($result['is_error'] || $result['count'] == 0) {
       return false;
